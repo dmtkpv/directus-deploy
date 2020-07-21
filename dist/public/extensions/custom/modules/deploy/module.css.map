@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://__DirectusExtension__/./src/module/module.vue?1980"],"names":[],"mappings":";AACA;AACA;AACA","file":"public/extensions/custom/modules/deploy/module.css","sourcesContent":["\n.my-module {\n    background: #F00;\n}\n"],"sourceRoot":""}
