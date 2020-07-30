@@ -33,7 +33,7 @@
         <v-header :breadcrumb="[]" icon="build" title="Deploy">
             <template slot="buttons">
                 <v-header-button
-                    :disabled="!editing || triggering"
+                    :disabled="!editing || pending || triggering"
                     :loading="saving"
                     :label="'Save'"
                     icon="check"
