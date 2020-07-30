@@ -94,6 +94,12 @@
         return error.info.error.response.status === 404;
     }
 
+    function wait (ms = 500) {
+        return new Promise(resolve => {
+            setTimeout(resolve, ms);
+        })
+    }
+
 
 
     // exports
@@ -153,10 +159,11 @@
             },
 
             update () {
+                if (this._isDestroyed) return;
                 this.request('/status')
                     .then(response => {
                         Object.assign(this.data, response.data);
-                        if (this.pending) this.update();
+                        if (this.pending) wait().then(() => this.update());
                     })
                     .catch(error => {
                         this.error(error);
