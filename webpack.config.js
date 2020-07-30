@@ -7,9 +7,7 @@ const file = {
     js: 'public/extensions/custom/modules/deploy/module.js',
     css: 'public/extensions/custom/modules/deploy/module.css',
     meta: 'public/extensions/custom/modules/deploy/meta.json',
-    script: 'public/extensions/custom/modules/deploy/deploy.sh',
-    hooks: 'public/extensions/custom/hooks/deploy-hooks.php',
-    endpoints: 'public/extensions/custom/endpoints/deploy-endpoints.php'
+    endpoints: 'public/extensions/custom/endpoints/deploy.php'
 };
 
 
@@ -39,8 +37,6 @@ module.exports = {
         new CopyPlugin({
             patterns: [
                 {from: 'src/module/meta.json', to: file.meta},
-                {from: 'src/module/deploy.sh', to: file.script},
-                {from: 'src/hooks.php', to: file.hooks},
                 {from: 'src/endpoints.php', to: file.endpoints}
             ],
         }),

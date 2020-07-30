@@ -33,7 +33,7 @@
         <v-header :breadcrumb="[]" icon="build" title="Deploy">
             <template slot="buttons">
                 <v-header-button
-                    :disabled="!editing"
+                    :disabled="!editing || triggering"
                     :loading="saving"
                     :label="'Save'"
                     icon="check"
@@ -66,7 +66,8 @@
             <v-button
                 class="trigger"
                 @click="trigger()"
-                :loading="triggering">
+                :disabled="!data.command || saving || editing"
+                :loading="pending || triggering">
                 Trigger deploy
             </v-button>
 
@@ -89,15 +90,10 @@
 
     import schema from './collection'
 
-    function removeId (fields) {
-        fields = [...fields];
-        fields.shift();
-        return fields;
-    }
-
     function is404 (error) {
         return error.info.error.response.status === 404;
     }
+
 
 
     // exports
@@ -106,7 +102,7 @@
 
         data () {
             return {
-                fields: removeId(schema.fields),
+                fields: schema.fields,
                 collection: schema.collection,
                 data: {},
                 edits: {},
@@ -127,15 +123,19 @@
 
             editing () {
                 return Object.keys(this.edits).length > 0;
+            },
+
+            pending () {
+                return this.data.status === 'Pending';
             }
 
         },
 
         methods: {
 
-            success () {
+            success (message) {
                 this.$notify({
-                    title: this.$t('settings_saved'),
+                    title: message,
                     color: 'green',
                     iconMain: 'check'
                 });
@@ -148,25 +148,34 @@
                 });
             },
 
-            trigger () {
-                this.triggering = true
+            request (route = '') {
+                return this.$api.api.request('get', `/custom/deploy${route}`)
+            },
 
-                // console.log(this.$api.api.request)
-                this.$api.api.request("get", "/custom/deploy")
-                    // .then(_ => {
-                    //     this.$notify({
-                    //         title: 'Deploy started',
-                    //         color: 'green',
-                    //         iconMain: 'check'
-                    //     });
-                    // })
-                    // .catch(error => {
-                    //     this.$events.emit('error', {notify: error.message || this.$t('something_went_wrong_body'), error});
-                    // })
-                    // .finally(() => {
-                    //     this.triggering = false
-                    // })
-                // console.log('trigger')
+            update () {
+                this.request('/status')
+                    .then(response => {
+                        Object.assign(this.data, response.data);
+                        if (this.pending) this.update();
+                    })
+                    .catch(error => {
+                        this.error(error);
+                    })
+            },
+
+            trigger () {
+                this.request()
+                    .then(() => {
+                        this.data.status = 'Pending';
+                        this.data.log = '';
+                        this.update();
+                    })
+                    .catch(error => {
+                        this.error(error);
+                    })
+                    .finally(() => {
+                        this.triggering = false;
+                    })
             },
 
             save () {
@@ -175,7 +184,7 @@
                     .then(response => {
                         this.edits = {};
                         this.data = response.data;
-                        this.success();
+                        this.success('Settings saved');
                     })
                     .catch(error => {
                         this.error(error);
@@ -193,9 +202,18 @@
 
         },
 
-        created () {
+        watch: {
+            'data.status' (value) {
+                this.$set(this.fields.status.options, 'iconLeft', {
+                    Pending: 'cached',
+                    Success: 'done',
+                    Error: 'error',
+                }[value]);
+            }
+        },
 
-            this.$api.getItem(schema.collection, 1)
+        created () {
+            this.request('/status')
                 .then(response => {
                     return response;
                 })
@@ -205,6 +223,7 @@
                 })
                 .then(response => {
                     this.data = response.data;
+                    if (this.pending) this.update();
                 })
                 .catch(error => {
                     this.error(error);

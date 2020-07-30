@@ -2,43 +2,34 @@ export default {
     collection: 'module_deploy',
     single: true,
     hidden: true,
-    fields: [
-        {
-            auto_increment: true,
-            datatype: 'INT',
+    fields: {
+        id: {
             field: 'id',
-            hidden_browse: true,
-            hidden_detail: true,
             interface: 'primary-key',
+            type: 'integer',
+            datatype: 'INT',
             length: 15,
             primary_key: true,
-            type: 'integer'
+            hidden_browse: true,
+            hidden_detail: true,
+            auto_increment: true,
         },
-        {
+        pid: {
+            field: 'pid',
+            interface: 'numeric',
+            type: 'integer',
+            datatype: 'INT',
+            hidden_browse: true,
+            hidden_detail: true
+        },
+        command: {
             field: 'command',
             interface: 'text-input',
             type: 'string',
             datatype: 'varchar',
             length: 200
         },
-        {
-            field: 'hooks',
-            interface: 'repeater',
-            type: 'json',
-            datatype: 'text',
-            options: {
-                fields: [
-                    {
-                        field: 'hook',
-                        interface: 'text-input',
-                        type: 'string'
-                    }
-                ],
-                template: '{{key}}'
-            },
-
-        },
-        {
+        divider: {
             field: 'divider',
             interface: 'divider',
             type: 'alias',
@@ -46,7 +37,7 @@ export default {
                 title: 'Last deploy'
             }
         },
-        {
+        status: {
             field: 'status',
             interface: 'text-input',
             type: 'string',
@@ -55,11 +46,10 @@ export default {
             width: 'half',
             readonly: true,
             options: {
-                // iconLeft: 'error',
                 placeholder: 'Fresh'
             }
         },
-        {
+        time: {
             field: 'time',
             interface: 'datetime',
             type: 'datetime',
@@ -67,12 +57,12 @@ export default {
             width: 'half',
             readonly: true
         },
-        {
+        log: {
             field: 'log',
             interface: 'code',
             type: 'string',
             datatype: 'text',
             readonly: true
         }
-    ]
+    }
 }
