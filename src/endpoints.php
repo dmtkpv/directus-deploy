@@ -28,7 +28,8 @@ return [
             $pid = $data['pid'];
 
             if ($pid && posix_getpgid($pid)) {
-                posix_kill($pid, SIGTERM);
+                exec('ps -p ' .  $pid . ' -o command=', $cmd);
+                if ($data['cmd'] === implode(',', $cmd)) posix_kill($pid, SIGTERM);
             }
 
 
@@ -48,12 +49,14 @@ return [
             $process = proc_open($data['command'], $descriptorspec, $pipes);
 
 
-            // update pid, status, time
+            // update pid, cmd, status, time
 
             $status = proc_get_status($process);
+            exec('ps -p ' . $status['pid'] . ' -o command=', $cmd); // get command info
 
             $itemsService->update('module_deploy', $data['id'], [
                 'pid' => $status['pid'],
+                'cmd' => implode(',', $cmd),
                 'status' => 'Pending',
                 'time' => date('Y-m-d H:i:s')
             ]);
@@ -74,6 +77,11 @@ return [
             else if ($return_value !== 15) {
                 $itemsService->update('module_deploy', $data['id'], ['status' => 'Error']);
             }
+
+
+            // save log to db
+
+            $itemsService->update('module_deploy', $data['id'], ['log' => file_get_contents($log)]);
 
 
         }

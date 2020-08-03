@@ -22,6 +22,15 @@ export default {
             hidden_browse: true,
             hidden_detail: true
         },
+        cmd: {
+            field: 'cmd',
+            interface: 'text-input',
+            type: 'string',
+            datatype: 'varchar',
+            length: 200,
+            hidden_browse: true,
+            hidden_detail: true
+        },
         command: {
             field: 'command',
             interface: 'text-input',
