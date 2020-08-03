@@ -94,13 +94,6 @@
         return error.info.error.response.status === 404;
     }
 
-    function wait (ms = 500) {
-        return new Promise(resolve => {
-            setTimeout(resolve, ms);
-        })
-    }
-
-
 
     // exports
 
@@ -163,7 +156,7 @@
                 this.request('/status')
                     .then(response => {
                         Object.assign(this.data, response.data);
-                        if (this.pending) wait().then(() => this.update());
+                        if (this.pending) setTimeout(() => this.update(), 1000);
                     })
                     .catch(error => {
                         this.error(error);
@@ -220,7 +213,7 @@
         },
 
         created () {
-            this.request('/status')
+            this.$api.getItem(schema.collection, 1)
                 .then(response => {
                     return response;
                 })
